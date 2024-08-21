@@ -31,8 +31,8 @@ This project started as a 2-step authentication system and has been expanded int
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
-   cd <project-directory>
+   git clone https://github.com/sakibansari546/MERN-Social-Media.git
+   cd MERN-Social-Media
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
