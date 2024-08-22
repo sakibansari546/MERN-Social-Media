@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useAuthStore } from '../store/auth.store'
 import { Navigate } from 'react-router-dom'
+import LeftSideBar from '../components/LeftSideBar';
 
 const HomePage = () => {
     const { user, checkAuth, isCheckingAuth, isAuthenticated } = useAuthStore();
@@ -18,16 +19,16 @@ const HomePage = () => {
     }
 
     // Check if user is authenticated and user object is defined
-    // if (!isAuthenticated || !user || !user.personal_info || !user.personal_info.isVerified) {
-    //     return <Navigate to='/signin' replace />;
-    // }
+    if (!isAuthenticated || !user || !user.personal_info || !user.personal_info.isVerified) {
+        return <Navigate to='/signin' replace />;
+    }
 
 
 
     return (
         <>
-            <div>
-                HomePage
+            <div className='bg-gray-100'>
+                <LeftSideBar />
             </div>
         </>
     )

@@ -8,6 +8,7 @@ import ResetPassword from './components/forgotPassword/ResetPassword'
 import { useAuthStore } from './store/auth.store'
 import { useEffect } from 'react'
 import HomePage from './pages/HomePage'
+import LeftSideBar from './components/LeftSideBar'
 
 // redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }) => {
@@ -43,7 +44,9 @@ function App() {
 
 
         <Route path='/' element={<Navbar />}>
-          <Route path='/' element={<HomePage />} />
+          <Route path='/' element={<LeftSideBar />} >
+            <Route path='/' element={<HomePage />} />
+          </Route>
         </Route>
       </Routes>
     </>
