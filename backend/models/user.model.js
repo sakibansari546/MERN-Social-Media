@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
             required: true,
             minlength: [3, 'fullname must be 3 letters long'],
         },
+        fullname: {
+            type: String,
+            default: "Full Name",
+        },
         email: {
             type: String,
             required: true,
@@ -38,16 +42,13 @@ const userSchema = new mongoose.Schema({
         bio: {
             type: String,
             maxlength: [200, 'Bio should not be more than 200'],
-            default: "",
+            default: "Bio...",
         },
         profile_img: {
             type: String,
             default: () => {
                 return `https://api.dicebear.com/6.x/${profile_imgs_collections_list[Math.floor(Math.random() * profile_imgs_collections_list.length)]}/svg?seed=${profile_imgs_name_list[Math.floor(Math.random() * profile_imgs_name_list.length)]}`
             }
-            // default: () => {
-            //     return `https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg`
-            // }
         },
     },
 },

@@ -5,6 +5,8 @@ import User from "../models/user.model.js";
 
 import { genrateTokenAndSetCookie } from "../utils/genrateTokenAndSetCookie.js";
 import { sendResetTokenEmail, sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
+import { getDataURI } from "../utils/dataUri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
@@ -270,6 +272,46 @@ export const checkAuth = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 }
+
+export const editProfile = async (req, res) => {
+    const { fullname, bio, username } = req.body;
+    const profileImage = req.file;
+
+    try {
+        let user = await User.findById(req.userId);
+        if (!user) return res.status(400).json({ message: "User not found", success: false });
+
+        // Check if the username is already taken by another user
+        let isUsername = await User.findOne({ "personal_info.username": username });
+        if (isUsername && isUsername._id.toString() !== req.userId) {
+            return res.status(400).json({ message: "Username already taken", success: false });
+        }
+
+        let cloudResponse;
+        if (profileImage) {
+            const fuleURI = getDataURI(profileImage);
+            await cloudinary.uploader.upload(fuleURI.content, { resource_type: 'image' }, (err, result) => {
+                if (err) return res.status(500).json({ message: "Error uploading image", success: false });
+                cloudResponse = result;
+            });
+        }
+
+        if (bio) user.personal_info.bio = bio;
+        if (fullname) user.personal_info.fullname = fullname;
+        if (username) user.personal_info.username = username;
+        if (profileImage) user.personal_info.profile_img = cloudResponse.secure_url;
+
+        await user.save().select("-personal_info.password");
+
+        return res.status(200).json({ message: "Profile updated successfully", success: true, user });
+
+    } catch (error) {
+        if (error.code === 11000 || error.keyPattern?.username) {
+            return res.status(400).json({ message: "Username already exists", success: false });
+        }
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
 
 
 

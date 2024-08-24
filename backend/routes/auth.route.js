@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { checkAuth, deleteUser, forgotPassword, logout, resetPassword, signin, signup, varifyEmail } from "../controllers/auth.controller.js";
+import { checkAuth, deleteUser, editProfile, forgotPassword, logout, resetPassword, signin, signup, varifyEmail } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
 const router = Router();
 
@@ -14,6 +14,7 @@ router.post('/verify-email', varifyEmail)
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password/:token', resetPassword)
 
+router.patch('/edit-profile', verifyToken, editProfile)
 
 router.delete('/delete', deleteUser)
 

@@ -20,7 +20,7 @@ const ProfilePage = () => {
             checkAuth();
         }
     }, [isAuthenticated, checkAuth, navigate]);
-    s
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -87,13 +87,13 @@ const ProfilePage = () => {
 
                             <ul className="hidden md:flex space-x-8 mb-4">
                                 <li>
-                                    <span className="font-semibold">136</span> posts
+                                    <span className="font-semibold">0</span> posts
                                 </li>
                                 <li>
-                                    <span className="font-semibold">40.5k</span> followers
+                                    <span className="font-semibold">0</span> followers
                                 </li>
                                 <li>
-                                    <span className="font-semibold">302</span> following
+                                    <span className="font-semibold">0</span> following
                                 </li>
                             </ul>
 
@@ -114,13 +114,13 @@ const ProfilePage = () => {
                     <div className="px-px md:px-3">
                         <ul className="flex md:hidden justify-around space-x-8 border-t border text-center p-2 text-gray-600 leading-snug text-sm">
                             <li>
-                                <span className="font-semibold text-gray-800 block">136</span> posts
+                                <span className="font-semibold text-gray-800 block">0</span> posts
                             </li>
                             <li>
-                                <span className="font-semibold text-gray-800 block">40.5k</span> followers
+                                <span className="font-semibold text-gray-800 block">0</span> followers
                             </li>
                             <li>
-                                <span className="font-semibold text-gray-800 block">302</span> following
+                                <span className="font-semibold text-gray-800 block">0</span> following
                             </li>
                         </ul>
                     </div>
