@@ -9,6 +9,9 @@ import { useAuthStore } from './store/auth.store'
 import { useEffect } from 'react'
 import HomePage from './pages/HomePage'
 import LeftSideBar from './components/LeftSideBar'
+import FeedPage from './pages/FeedPage'
+import SearchPage from './pages/SearchPage'
+import ProfilePage from './pages/ProfilePage'
 
 // redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }) => {
@@ -45,7 +48,9 @@ function App() {
 
         <Route path='/' element={<Navbar />}>
           <Route path='/' element={<LeftSideBar />} >
-            <Route path='/' element={<HomePage />} />
+            <Route path='/' element={<FeedPage />} />
+            <Route path='/Search' element={<SearchPage />} />
+            <Route path='/profile/:userId' element={<ProfilePage />} />
           </Route>
         </Route>
       </Routes>
