@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { checkAuth, deleteUser, editProfile, forgotPassword, logout, resetPassword, signin, signup, varifyEmail } from "../controllers/auth.controller.js";
+import { checkAuth, deleteUser, editProfile, forgotPassword, getUserProfile, logout, resetPassword, signin, signup, varifyEmail } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
 import { upload } from "../middlewares/multer.js";
 const router = Router();
 
 router.get('/check-auth', verifyToken, checkAuth);
+router.get('/get-user-profile/:userId', getUserProfile);
 
 router.post('/signup', signup)
 router.post('/signin', signin)

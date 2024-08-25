@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/auth.store';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user, editProfile, error, checkAuth, isAuthenticated } = useAuthStore();
+    const { userId } = useParams();
+
+    const { user, userProfile, getProfile, editProfile, error, checkAuth, isAuthenticated } = useAuthStore();
+
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [formData, setFormData] = useState({
         username: user?.personal_info?.username || '',
@@ -22,7 +25,7 @@ const ProfilePage = () => {
             navigate('/signin');
         } else {
             checkAuth();
-            // getProfile()
+            getProfile(userId)
         }
     }, [isAuthenticated, checkAuth, navigate]);
 
@@ -64,6 +67,7 @@ const ProfilePage = () => {
     const uploadImage = async (e) => {
         e.preventDefault();
         if (loading) return; // Prevent multiple requests while loading
+        if (user._id !== userProfile._id) return toast.error("You are not authorized to edit this profile")
 
         setLoading(true);
         const formData = new FormData();
@@ -101,9 +105,9 @@ const ProfilePage = () => {
                                 />
                                 <img
                                     className="w-20 h-20 flex items-center justify-center md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1 cursor-pointer"
-                                    src={profileImage ? URL.createObjectURL(profileImage) : user?.personal_info.profile_img} // Image preview
+                                    src={profileImage ? URL.createObjectURL(profileImage) : userProfile?.personal_info.profile_img} // Image preview
                                     alt="profile"
-                                    onClick={handleImageClick} // Trigger file input on image click
+                                    onClick={user?._id === userProfile?._id && handleImageClick} // Trigger file input on image click
                                 />
                                 {error && <p className='text-red-500 ml- mt-3 text-lg'>{error}</p>}
                                 {
@@ -123,7 +127,7 @@ const ProfilePage = () => {
                         <div className="w-8/12 md:w-7/12 ml-4">
                             <div className="md:flex md:flex-wrap md:items-center mb-4">
                                 <h2 className="text-2xl inline-block font-light md:mr-2 mb-2 sm:mb-0">
-                                    @{user?.personal_info?.username || 'Username'}
+                                    @{userProfile?.personal_info?.username || 'Username'}
                                 </h2>
 
                                 <span
@@ -135,18 +139,23 @@ const ProfilePage = () => {
 
                                 <div className='flex gap-3'>
 
-                                    <button
-                                        className="w-16 bg-[#00d7ff] px-2 py-1 text-white font-semibold text-sm rounded block text-center sm:inline-block"
-                                    >
-                                        Follow
-                                    </button>
-
-                                    <button
-                                        className="w-16 bg-gray-300 px-2 py-1 text-black font-semibold text-sm rounded block text-center sm:inline-block"
-                                        onClick={() => setIsPopupOpen(true)}
-                                    >
-                                        Edit
-                                    </button>
+                                    {
+                                        user?._id !== userProfile?._id &&
+                                        <button
+                                            className="w-16 bg-[#00d7ff] px-2 py-1 text-white font-semibold text-sm rounded block text-center sm:inline-block"
+                                        >
+                                            Follow
+                                        </button>
+                                    }
+                                    {
+                                        user?._id === userProfile?._id &&
+                                        <button
+                                            className="w-16 bg-gray-300 px-2 py-1 text-black font-semibold text-sm rounded block text-center sm:inline-block"
+                                            onClick={() => setIsPopupOpen(true)}
+                                        >
+                                            Edit
+                                        </button>
+                                    }
                                 </div>
                             </div>
 
@@ -163,14 +172,14 @@ const ProfilePage = () => {
                             </ul>
 
                             <div className="hidden md:block">
-                                <h1 className="font-semibold">{user?.personal_info.fullname || 'Full Name'}</h1>
+                                <h1 className="font-semibold">{userProfile?.personal_info.fullname || 'Full Name'}</h1>
                                 <span></span>
                                 <p>{user?.personal_info?.bio || "Bio..."}</p>
                             </div>
                         </div>
 
                         <div className="md:hidden text-sm my-2">
-                            <h1 className="font-semibold">{user?.personal_info.fullname || 'Full Name'}</h1>
+                            <h1 className="font-semibold">{userProfile?.personal_info.fullname || 'Full Name'}</h1>
                             <span></span>
                             <p>{user?.personal_info?.bio || "Bio..."}</p>
                         </div>

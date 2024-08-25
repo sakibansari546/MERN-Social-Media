@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_MODE === "development" ? "http://localhost:
 
 export const useAuthStore = create((set) => ({
     user: null,
+    userProfile: null,
     isAuthenticated: false,
     error: null,
     isLoading: false,
@@ -90,6 +91,9 @@ export const useAuthStore = create((set) => ({
         try {
             const res = await axios.patch(`${API_URL}/edit-profile`, formData, { withCredentials: true });
             set({ user: res.data.user, isLoading: false });
+            console.log(res.data.user);
+            console.log(userProfile);
+
             return res.data.user;
         } catch (error) {
             console.error('Edit Profile Error:', error.response ? error.response.data : error.message);
@@ -97,11 +101,11 @@ export const useAuthStore = create((set) => ({
             throw error;
         }
     },
-    getProfile: async () => {
+    getProfile: async (userId) => {
         set({ isLoading: true, error: null });
         try {
-            const res = await axios.get(`${API_URL}/get-profile/${userId}`, { withCredentials: true });
-            set({ user: res.data.user, isLoading: false });
+            const res = await axios.get(`${API_URL}/get-user-profile/${userId}`, { withCredentials: true });
+            set({ userProfile: res.data.user, isLoading: false });
             return res.data.user;
         } catch (error) {
             console.error('Get Profile Error:', error.response ? error.response.data : error.message);

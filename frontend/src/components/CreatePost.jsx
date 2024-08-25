@@ -10,7 +10,7 @@ const CreatePost = () => {
         postImage: null
     });
 
-    const { createPost, isLoading, error } = postStore();
+    const { createPost, getPosts, isLoading, error } = postStore();
 
     const handleImageClick = () => {
         postRef.current.click();
@@ -38,7 +38,7 @@ const CreatePost = () => {
 
             // Await the post creation process
             await createPost(updateData);
-
+            await getPosts()
             // Update the toast to success
             toast.success("Post created successfully", { id: loadingToastId });
 

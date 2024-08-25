@@ -273,19 +273,18 @@ export const checkAuth = async (req, res) => {
     }
 }
 
-// export const getUserProfile = async (req, res) => {
-//     const { userId } = req.params; // Extract the user ID from the request parameters
+export const getUserProfile = async (req, res) => {
+    const { userId } = req.params; // Extract the user ID from the request parameters
+    try {
+        const user = await User.findById(userId).select('-personal_info.password'); // Find user by ID and exclude password
+        if (!user) return res.status(404).json({ message: "User not found", success: false });
 
-//     try {
-//         const user = await User.findById(userId).select('-personal_info.password'); // Find user by ID and exclude password
-//         if (!user) return res.status(404).json({ message: "User not found", success: false });
-
-//         res.status(200).json({ user });
-//     } catch (error) {
-//         console.error('Error fetching user profile:', error);
-//         res.status(500).json({ message: "Internal server error", success: false });
-//     }
-// };
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
 
 export const editProfile = async (req, res) => {
     const { fullname, bio, username } = req.body;
