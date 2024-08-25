@@ -33,7 +33,7 @@ function App() {
   }, [checkAuth])
 
   return (
-    <>
+    <div className='w-full h-full bg-gray-100'>
       <Routes>
         <Route path='/signup' element={<AuthForm type='signup' />} />
         <Route path='/signin' element={<AuthForm type='signin' />} />
@@ -54,7 +54,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
-    </>
+    </div>
   )
 }
 

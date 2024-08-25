@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useAuthStore } from '../store/auth.store'
 import { Navigate } from 'react-router-dom'
+import CreatePost from '../components/CreatePost';
 
 const FeedPage = () => {
     const { user, checkAuth, isCheckingAuth, isAuthenticated } = useAuthStore();
@@ -23,8 +24,9 @@ const FeedPage = () => {
     // }
 
     return (
-        <div>
-            Feed
+        <div className=''>
+            <CreatePost />
+
         </div>
     )
 }
