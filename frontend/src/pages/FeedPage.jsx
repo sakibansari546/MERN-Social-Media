@@ -2,30 +2,24 @@ import React, { useEffect } from 'react'
 import { useAuthStore } from '../store/auth.store'
 import { Navigate } from 'react-router-dom'
 import CreatePost from '../components/CreatePost';
+import Posts from '../components/Posts';
 
 const FeedPage = () => {
     const { user, checkAuth, isCheckingAuth, isAuthenticated } = useAuthStore();
 
-    // useEffect(() => {
-    //     const checkAuthAsync = async () => {
-    //         await checkAuth();
-    //     };
-    //     checkAuthAsync()
-    // }, [checkAuth]);
-
     if (isCheckingAuth) {
-        // You can return a loading spinner or a placeholder while checking authentication
         return <div>Loading...</div>;
     }
 
-    // Check if user is authenticated and user object is defined
-    // if (!isAuthenticated || !user || !user.personal_info || !user.personal_info.isVerified) {
-    //     return <Navigate to='/signin' replace />;
-    // }
 
     return (
-        <div className=''>
-            <CreatePost />
+        <div className='w-full h-screen md:px-16 bg-white md:ml-24 lg:ml-72 my-1 md:mr-16 md:w-[50rem]'>
+            {
+                isAuthenticated && user && user.personal_info && user.personal_info.isVerified && (
+                    <CreatePost />
+                )
+            }
+            <Posts />
 
         </div>
     )
