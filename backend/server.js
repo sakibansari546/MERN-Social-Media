@@ -3,8 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
-import authRoutes from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
+
+import authRoutes from "./routes/auth.route.js";
+import postRoutes from "./routes/post.route.js";
 
 const server = express()
 const PORT = process.env.PORT || 3000
@@ -23,6 +25,7 @@ server.use(cookieParser())
 
 // Routes
 server.use('/api/auth', authRoutes)
+server.use('/api/post', postRoutes)
 
 
 server.listen(PORT, () => {
