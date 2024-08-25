@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/auth.store';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ const ProfilePage = () => {
             navigate('/signin');
         } else {
             checkAuth();
+            // getProfile()
         }
     }, [isAuthenticated, checkAuth, navigate]);
 
@@ -49,8 +51,10 @@ const ProfilePage = () => {
 
         try {
             await editProfile(updatedData);
+            toast.success("Profile updated successfully!");
         } catch (err) {
             console.error(err);
+            toast.error("Failed to update profile.");
         } finally {
             setLoading(false);
             setIsPopupOpen(false);
@@ -67,8 +71,10 @@ const ProfilePage = () => {
 
         try {
             await editProfile(formData);
+            toast.success("Profile image updated successfully!");
         } catch (err) {
             console.error(err);
+            toast.error("Failed to update profile image.");
         } finally {
             setLoading(false);
             setProfileImage(null);
@@ -128,11 +134,13 @@ const ProfilePage = () => {
                                 </span>
 
                                 <div className='flex gap-3'>
+
                                     <button
                                         className="w-16 bg-[#00d7ff] px-2 py-1 text-white font-semibold text-sm rounded block text-center sm:inline-block"
                                     >
                                         Follow
                                     </button>
+
                                     <button
                                         className="w-16 bg-gray-300 px-2 py-1 text-black font-semibold text-sm rounded block text-center sm:inline-block"
                                         onClick={() => setIsPopupOpen(true)}
@@ -227,11 +235,11 @@ const ProfilePage = () => {
                                 Cancel
                             </button>
                             <button
-                                className={`bg-[#00d7ff] text-white px-4 py-2 rounded-md ${loading ? 'cursor-not-allowed bg-slate-500' : ''}`}
+                                className={`bg-[#00d7ff] text-white px-4 py-2 rounded-md ${loading ? 'bg-opacity-50 cursor-not-allowed' : ''}`}
                                 onClick={handleSubmit}
                                 disabled={loading}
                             >
-                                {loading ? "Wait..." : "Update"}
+                                {loading ? 'Saving...' : 'Save'}
                             </button>
                         </div>
                     </div>

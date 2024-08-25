@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 import imageIcon from '../assets/add-image.svg';
+import postStore from '../store/post.store'
+import toast from 'react-hot-toast';
 
 const CreatePost = () => {
     const postRef = useRef(null);
@@ -7,6 +9,8 @@ const CreatePost = () => {
         caption: "",
         postImage: null
     });
+
+    const { createPost, isLoading, error } = postStore();
 
     const handleImageClick = () => {
         postRef.current.click();
@@ -21,17 +25,32 @@ const CreatePost = () => {
         }
     };
 
-    const handleClick = () => {
-        const updateData = new FormData();
-        updateData.append('caption', formData.caption);
-        if (formData.postImage) {
-            updateData.append('postImage', formData.postImage);
+    const handleClick = async () => {
+        // Show loading toast
+        const loadingToastId = toast.loading("Creating post...");
+
+        try {
+            const updateData = new FormData();
+            updateData.append('caption', formData.caption);
+            if (formData.postImage) {
+                updateData.append('postImage', formData.postImage);
+            }
+
+            // Await the post creation process
+            await createPost(updateData);
+
+            // Update the toast to success
+            toast.success("Post created successfully", { id: loadingToastId });
+
+            // Reset form data
+            setFormData({
+                caption: "",
+                postImage: null
+            });
+        } catch (error) {
+            // Update the toast to error
+            toast.error(error.message, { id: loadingToastId });
         }
-
-        console.log(updateData);
-        console.log(formData);
-
-
     };
 
     return (
@@ -40,7 +59,9 @@ const CreatePost = () => {
                 <div className='py-4 px-5 relative'>
                     <input
                         onChange={handleChange}
-                        className='w-full bg-gray-100 p-2 px-4'
+                        value={formData.caption}
+                        disabled={isLoading}
+                        className={`w-full bg-gray-100 p-2 px-4 `}
                         type="text"
                         placeholder='Write a post'
                         name='caption'
@@ -53,20 +74,23 @@ const CreatePost = () => {
                         name="postImage"
                         accept="image/*"
                     />
+                    {
+                        isLoading ? <p className='absolute top-6 right-8'>Loading...</p> : error ? <p>Error: {error.message}</p> :
 
-                    <div className='absolute top-6 right-8 flex items-center gap-4'>
-                        <button onClick={handleImageClick}>
-                            <img
-                                src={imageIcon}
-                                className='w-5 h-5'
-                                alt="Upload"
-                            />
-                        </button>
-                        {
-                            formData.caption && formData.postImage &&
-                            <button onClick={handleClick} className='text-xl font-bold text-[#00d7ff]'>Post</button>
-                        }
-                    </div>
+                            <div className='absolute top-6 right-8 flex items-center gap-4'>
+                                <button onClick={handleImageClick}>
+                                    <img
+                                        src={imageIcon}
+                                        className='w-5 h-5'
+                                        alt="Upload"
+                                    />
+                                </button>
+                                {
+                                    formData.caption && formData.postImage &&
+                                    <button onClick={handleClick} className='text-xl font-bold text-[#00d7ff]'>Post</button>
+                                }
+                            </div>
+                    }
                 </div>
                 {
                     formData.postImage &&

@@ -10,10 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "flaticon": "^0.1.0",
     "@flaticon/flaticon-uicons": "^2.2.0",
+    "flaticon": "^0.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.26.1",
     "zustand": "^4.5.5"
   },

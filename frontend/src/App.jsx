@@ -12,6 +12,7 @@ import LeftSideBar from './components/LeftSideBar'
 import FeedPage from './pages/FeedPage'
 import SearchPage from './pages/SearchPage'
 import ProfilePage from './pages/ProfilePage'
+import { Toaster } from 'react-hot-toast'
 
 // redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }) => {
@@ -33,7 +34,8 @@ function App() {
   }, [checkAuth])
 
   return (
-    <div className='w-full h-full bg-gray-100'>
+    <div className='w-full bg-gray-100'>
+      <Toaster />
       <Routes>
         <Route path='/signup' element={<AuthForm type='signup' />} />
         <Route path='/signin' element={<AuthForm type='signin' />} />

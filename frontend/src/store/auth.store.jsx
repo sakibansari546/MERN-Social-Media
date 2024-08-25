@@ -96,6 +96,18 @@ export const useAuthStore = create((set) => ({
             set({ error: error.response?.data?.message || "Error editing profile", isLoading: false });
             throw error;
         }
+    },
+    getProfile: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const res = await axios.get(`${API_URL}/get-profile/${userId}`, { withCredentials: true });
+            set({ user: res.data.user, isLoading: false });
+            return res.data.user;
+        } catch (error) {
+            console.error('Get Profile Error:', error.response ? error.response.data : error.message);
+            set({ error: error.response?.data?.message || "Error getting profile", isLoading: false });
+            throw error;
+        }
     }
 
 }));

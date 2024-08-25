@@ -273,6 +273,20 @@ export const checkAuth = async (req, res) => {
     }
 }
 
+// export const getUserProfile = async (req, res) => {
+//     const { userId } = req.params; // Extract the user ID from the request parameters
+
+//     try {
+//         const user = await User.findById(userId).select('-personal_info.password'); // Find user by ID and exclude password
+//         if (!user) return res.status(404).json({ message: "User not found", success: false });
+
+//         res.status(200).json({ user });
+//     } catch (error) {
+//         console.error('Error fetching user profile:', error);
+//         res.status(500).json({ message: "Internal server error", success: false });
+//     }
+// };
+
 export const editProfile = async (req, res) => {
     const { fullname, bio, username } = req.body;
     const profileImage = req.file;
@@ -283,13 +297,23 @@ export const editProfile = async (req, res) => {
 
         // Check if the username is already taken by another user
         let isUsername = await User.findOne({ "personal_info.username": username });
-        if (isUsername && isUsername._id.toString() !== req.userId) {
-            return res.status(400).json({ message: "Username already taken", success: false });
+
+        // Normalize username: remove spaces and convert to lowercase
+        if (username) {
+            const normalizedUsername = username.replace(/\s+/g, '').toLowerCase();
+
+            // Check if the normalized username is already taken by another user
+            let isUsername = await User.findOne({ "personal_info.username": normalizedUsername });
+            if (isUsername && isUsername._id.toString() !== req.userId) {
+                return res.status(400).json({ message: "Username already taken", success: false });
+            }
+
+            user.personal_info.username = normalizedUsername;
         }
+
 
         if (bio) user.personal_info.bio = bio;
         if (fullname) user.personal_info.fullname = fullname;
-        if (username) user.personal_info.username = username;
 
         if (profileImage) {
             const fileURI = getDataURI(profileImage);
