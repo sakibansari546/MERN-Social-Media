@@ -293,7 +293,6 @@ export const editProfile = async (req, res) => {
 
         if (profileImage) {
             const fileURI = getDataURI(profileImage);
-            console.log(fileURI);
 
             try {
                 const cloudResponse = await cloudinary.uploader.upload(fileURI, { resource_type: 'image' });

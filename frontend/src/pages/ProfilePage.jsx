@@ -4,16 +4,17 @@ import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user, editProfile, isLoading, checkAuth, isAuthenticated } = useAuthStore();
+    const { user, editProfile, error, checkAuth, isAuthenticated } = useAuthStore();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [formData, setFormData] = useState({
         username: user?.personal_info?.username || '',
-        fullName: user?.fullName || '',
+        fullname: user?.personal_info?.fullname || '',
         bio: user?.personal_info?.bio || '',
-        profileImg: user?.personal_info?.profile_img || ''
     });
+    const [profileImage, setProfileImage] = useState(null); // To store the selected file
+    const [loading, setLoading] = useState(false); // Manage loading state
 
-    const fileInputRef = useRef(null); // Create a ref for the file input
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -28,33 +29,55 @@ const ProfilePage = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleImageChange = (e) => {
-        setFormData({ ...formData, profileImg: e.target.files[0] });
-    };
     const handleImageClick = () => {
-        fileInputRef.current.click(); // Trigger the file input click when the image is clicked
+        fileInputRef.current.click();
     };
 
-    const handleProfileImgChange = async () => {
-        setFormData({ ...formData, profileImg: e.target.files[0] });
-        console.log(formData);
-
-        await editProfile(formData);
-    }
-
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfileImage(file);
+        }
+    };
 
     const handleSubmit = async () => {
-        setIsPopupOpen(false);
-        await editProfile(formData);
+        setLoading(true);
+        const updatedData = new FormData();
+        updatedData.append('username', formData.username);
+        updatedData.append('fullname', formData.fullname);
+        updatedData.append('bio', formData.bio);
+
+        try {
+            await editProfile(updatedData);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+            setIsPopupOpen(false);
+        }
+    };
+
+    const uploadImage = async (e) => {
+        e.preventDefault();
+        if (loading) return; // Prevent multiple requests while loading
+
+        setLoading(true);
+        const formData = new FormData();
+        formData.append('profileImage', profileImage);
+
+        try {
+            await editProfile(formData);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+            setProfileImage(null);
+        }
     };
 
     const handleCancel = () => {
         setIsPopupOpen(false);
     };
-
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <>
@@ -62,20 +85,32 @@ const ProfilePage = () => {
                 <div className="lg:w-8/12 lg:mx-auto mb-8">
                     <header className="flex flex-wrap items-center p-4 md:py-8 md:pl-14">
                         <div className="md:w-3/12 md:ml-16">
-                            <form onSubmit={handleProfileImgChange}>
+                            <form>
                                 <input
                                     type="file"
                                     ref={fileInputRef}
-                                    style={{ display: 'none' }}
-                                    onChange={handleImageChange}
+                                    className='hidden'
+                                    onChange={handleImageChange} // Handle file change
                                     accept="image/*"
                                 />
                                 <img
-                                    className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1 cursor-pointer"
-                                    src={user?.personal_info.profile_img}
+                                    className="w-20 h-20 flex items-center justify-center md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1 cursor-pointer"
+                                    src={profileImage ? URL.createObjectURL(profileImage) : user?.personal_info.profile_img} // Image preview
                                     alt="profile"
                                     onClick={handleImageClick} // Trigger file input on image click
                                 />
+                                {error && <p className='text-red-500 ml- mt-3 text-lg'>{error}</p>}
+                                {
+                                    profileImage &&
+                                    <button
+                                        onClick={uploadImage}
+                                        type='submit'
+                                        className={`w-16 ml-12 mt-3 ${loading ? "bg-slate-500 cursor-not-allowed" : "bg-[#00d7ff]"} px-2 py-1 text-white font-semibold text-sm rounded block text-center sm:inline-block`}
+                                        disabled={loading}
+                                    >
+                                        {loading ? "Wait..." : "Upload"}
+                                    </button>
+                                }
                             </form>
                         </div>
 
@@ -167,8 +202,8 @@ const ProfilePage = () => {
                             <label className="block text-sm font-medium text-gray-700">Full Name</label>
                             <input
                                 type="text"
-                                name="fullName"
-                                value={formData.fullName}
+                                name="fullname"
+                                value={formData.fullname}
                                 onChange={handleInputChange}
                                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
                             />
@@ -187,14 +222,16 @@ const ProfilePage = () => {
                             <button
                                 className="bg-gray-300 text-black px-4 py-2 rounded-md"
                                 onClick={handleCancel}
+                                disabled={loading}
                             >
                                 Cancel
                             </button>
                             <button
-                                className={`bg-[#00d7ff] text-white px-4 py-2 rounded-md ${isLoading && 'disabled:true'}`}
+                                className={`bg-[#00d7ff] text-white px-4 py-2 rounded-md ${loading ? 'cursor-not-allowed bg-slate-500' : ''}`}
                                 onClick={handleSubmit}
+                                disabled={loading}
                             >
-                                Update
+                                {loading ? "Wait..." : "Update"}
                             </button>
                         </div>
                     </div>

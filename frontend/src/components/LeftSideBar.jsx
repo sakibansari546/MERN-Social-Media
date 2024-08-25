@@ -26,7 +26,7 @@ const LeftSideBar = () => {
                         <span className=' hidden sm:block'>Notification</span>
                     </Link>
                     <Link to={`/profile/${user?._id}`} className='lg:w-full lg:px- text-center lg:flex items-center gap-2 lg:text-xl font-semibold lg:justify-evenly bg-white w-full h-full py-4'>
-                        <img src={user?.personal_info.profile_img} className='w-12 h-12 rounded-full border ml-6' alt="" />
+                        <img src={user?.personal_info.profile_img} className='w-12 h-12 rounded-full border ml-6 object-cover' alt="" />
                         <span className=' hidden sm:block'>Profile</span>
                     </Link>
                 </div>

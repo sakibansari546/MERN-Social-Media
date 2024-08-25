@@ -30,9 +30,9 @@ const Navbar = () => {
                             </div>
                             {isAuthenticated ? (
                                 <div className='flex items-center gap-5'>
-                                    <Link to={`/profile`} className='bg-gray-200 rounded-full'>
+                                    {/* <Link to={`/profile`} className='bg-gray-200 rounded-full'>
                                         <img src={user.personal_info.profile_img} className='w-10 h-10 md:w-12 md:h-12 rounded-full object-cover' alt="Profile" />
-                                    </Link>
+                                    </Link> */}
                                     <button onClick={logout} className='rounded-full w-8 h-8 md:w-10 md:h-10 hover:bg-gray-100 transition-all'>
                                         <i className="fi fi-br-sign-out-alt text-xl md:text-2xl"></i>
                                     </button>
