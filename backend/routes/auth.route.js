@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { checkAuth, deleteUser, editProfile, forgotPassword, logout, resetPassword, signin, signup, varifyEmail } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
+import { upload } from "../middlewares/multer.js";
 const router = Router();
 
 router.get('/check-auth', verifyToken, checkAuth);
@@ -14,7 +15,7 @@ router.post('/verify-email', varifyEmail)
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password/:token', resetPassword)
 
-router.patch('/edit-profile', verifyToken, editProfile)
+router.patch('/edit-profile', verifyToken, upload.single('profileImage'), editProfile);
 
 router.delete('/delete', deleteUser)
 

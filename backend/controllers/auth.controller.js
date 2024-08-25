@@ -287,31 +287,39 @@ export const editProfile = async (req, res) => {
             return res.status(400).json({ message: "Username already taken", success: false });
         }
 
-        let cloudResponse;
-        if (profileImage) {
-            const fuleURI = getDataURI(profileImage);
-            await cloudinary.uploader.upload(fuleURI.content, { resource_type: 'image' }, (err, result) => {
-                if (err) return res.status(500).json({ message: "Error uploading image", success: false });
-                cloudResponse = result;
-            });
-        }
-
         if (bio) user.personal_info.bio = bio;
         if (fullname) user.personal_info.fullname = fullname;
         if (username) user.personal_info.username = username;
-        if (profileImage) user.personal_info.profile_img = cloudResponse.secure_url;
 
-        await user.save().select("-personal_info.password");
+        if (profileImage) {
+            const fileURI = getDataURI(profileImage);
+            console.log(fileURI);
+
+            try {
+                const cloudResponse = await cloudinary.uploader.upload(fileURI, { resource_type: 'image' });
+                user.personal_info.profile_img = cloudResponse.secure_url;
+            } catch (err) {
+                return res.status(500).json({ message: "Error uploading image", success: false });
+            }
+        }
+
+        await user.save();
+
+        // Exclude password from the response
+        user = user.toObject();
+        delete user.personal_info.password;
 
         return res.status(200).json({ message: "Profile updated successfully", success: true, user });
 
     } catch (error) {
+        console.log(error);
         if (error.code === 11000 || error.keyPattern?.username) {
             return res.status(400).json({ message: "Username already exists", success: false });
         }
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 };
+
 
 
 

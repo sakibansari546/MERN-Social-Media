@@ -83,5 +83,20 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             console.error('Logout Error:', error.message);
         }
+    },
+
+    editProfile: async (formData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const res = await axios.patch(`${API_URL}/edit-profile`, formData, { withCredentials: true });
+            set({ user: res.data.user, isLoading: false });
+
+            return res.data.user;
+        } catch (error) {
+            console.error('Edit Profile Error:', error.response ? error.response.data : error.message);
+            set({ error: error.response?.data?.message || "Error editing profile", isLoading: false });
+            throw error;
+        }
     }
+
 }));

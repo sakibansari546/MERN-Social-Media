@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/auth.store';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user, isLoading, checkAuth, isAuthenticated, updateUser } = useAuthStore();
+    const { user, editProfile, isLoading, checkAuth, isAuthenticated } = useAuthStore();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [formData, setFormData] = useState({
         username: user?.personal_info?.username || '',
@@ -12,6 +12,8 @@ const ProfilePage = () => {
         bio: user?.personal_info?.bio || '',
         profileImg: user?.personal_info?.profile_img || ''
     });
+
+    const fileInputRef = useRef(null); // Create a ref for the file input
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -29,11 +31,21 @@ const ProfilePage = () => {
     const handleImageChange = (e) => {
         setFormData({ ...formData, profileImg: e.target.files[0] });
     };
+    const handleImageClick = () => {
+        fileInputRef.current.click(); // Trigger the file input click when the image is clicked
+    };
 
-    const handleSubmit = () => {
-        // Logic to update the user data
-        updateUser(formData); // You might need to adjust this based on how your updateUser function is implemented
+    const handleProfileImgChange = async () => {
+        setFormData({ ...formData, profileImg: e.target.files[0] });
+        console.log(formData);
+
+        await editProfile(formData);
+    }
+
+
+    const handleSubmit = async () => {
         setIsPopupOpen(false);
+        await editProfile(formData);
     };
 
     const handleCancel = () => {
@@ -50,11 +62,21 @@ const ProfilePage = () => {
                 <div className="lg:w-8/12 lg:mx-auto mb-8">
                     <header className="flex flex-wrap items-center p-4 md:py-8 md:pl-14">
                         <div className="md:w-3/12 md:ml-16">
-                            <img
-                                className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1"
-                                src={user?.personal_info.profile_img}
-                                alt="profile"
-                            />
+                            <form onSubmit={handleProfileImgChange}>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    style={{ display: 'none' }}
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                />
+                                <img
+                                    className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1 cursor-pointer"
+                                    src={user?.personal_info.profile_img}
+                                    alt="profile"
+                                    onClick={handleImageClick} // Trigger file input on image click
+                                />
+                            </form>
                         </div>
 
                         <div className="w-8/12 md:w-7/12 ml-4">
@@ -98,14 +120,14 @@ const ProfilePage = () => {
                             </ul>
 
                             <div className="hidden md:block">
-                                <h1 className="font-semibold">{user?.fullName || 'Full Name'}</h1>
+                                <h1 className="font-semibold">{user?.personal_info.fullname || 'Full Name'}</h1>
                                 <span></span>
                                 <p>{user?.personal_info?.bio || "Bio..."}</p>
                             </div>
                         </div>
 
                         <div className="md:hidden text-sm my-2">
-                            <h1 className="font-semibold">{user?.fullName || 'Full Name'}</h1>
+                            <h1 className="font-semibold">{user?.personal_info.fullname || 'Full Name'}</h1>
                             <span></span>
                             <p>{user?.personal_info?.bio || "Bio..."}</p>
                         </div>
@@ -169,7 +191,7 @@ const ProfilePage = () => {
                                 Cancel
                             </button>
                             <button
-                                className="bg-[#00d7ff] text-white px-4 py-2 rounded-md"
+                                className={`bg-[#00d7ff] text-white px-4 py-2 rounded-md ${isLoading && 'disabled:true'}`}
                                 onClick={handleSubmit}
                             >
                                 Update
