@@ -63,7 +63,7 @@ const CreatePost = () => {
                         disabled={isLoading}
                         className={`w-full bg-gray-100 p-2 px-4 `}
                         type="text"
-                        placeholder='Write a post'
+                        placeholder='Write caption here'
                         name='caption'
                     />
                     <input

@@ -53,3 +53,31 @@ export const getPosts = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const likeOrNot = async (req, res) => {
+    const { postId } = req.body;
+    const userId = req.userId;
+    try {
+        const post = await Post.findById(postId);
+        const user = await User.findById(userId);
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (post.likes.includes(userId)) {
+            post.likes.pull(userId);
+            user.likedPost.pull(postId);
+            res.status(200).json({ message: "Post unliked successfully", success: true });
+        } else {
+            post.likes.push(userId);
+            user.likedPost.push(postId);
+            res.status(200).json({ message: "Post liked successfully", success: true });
+        }
+        await post.save();
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
