@@ -31,7 +31,7 @@ function App() {
 
   useEffect(() => {
     checkAuth()
-  }, [checkAuth])
+  }, [])
 
   return (
     <div className='w-full bg-gray-100'>

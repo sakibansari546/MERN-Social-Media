@@ -17,10 +17,10 @@ const LeftSideBar = () => {
                         <i class="fi fi-rr-search text-3xl hover:text-gray-900 text-gray-500"></i>
                         <span className=' hidden sm:block'>Seacrh</span>
                     </Link>
-                    <Link to='/create' className='lg:w-full lg:px- text-center lg:flex items-center gap-2 lg:text-xl font-semibold lg:justify-evenly bg-white w-full h-full py-4'>
+                    <button className='lg:w-full lg:px- text-center lg:flex items-center gap-2 lg:text-xl font-semibold lg:justify-evenly bg-white w-full h-full py-4'>
                         <i class="fi fi-br-plus text-3xl hover:text-gray-900 text-gray-500"></i>
                         <span className=' hidden sm:block'>Create</span>
-                    </Link>
+                    </button>
                     <Link to='/notification' className='lg:w-full lg:px- text-center lg:flex items-center gap-2 lg:text-xl font-semibold lg:justify-evenly bg-white w-full h-full py-4'>
                         <i class="fi fi-rr-bell text-3xl hover:text-gray-900 text-gray-500"></i>
                         <span className=' hidden sm:block'>Notification</span>

@@ -7,7 +7,7 @@ const ProfilePage = () => {
     const navigate = useNavigate();
     const { userId } = useParams();
 
-    const { user, userProfile, getProfile, editProfile, error, checkAuth, isAuthenticated } = useAuthStore();
+    const { user, followOrUnfollow, userProfile, isLoading, getProfile, editProfile, error, checkAuth, isAuthenticated } = useAuthStore();
 
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [formData, setFormData] = useState({
@@ -15,19 +15,24 @@ const ProfilePage = () => {
         fullname: user?.personal_info?.fullname || '',
         bio: user?.personal_info?.bio || '',
     });
-    const [profileImage, setProfileImage] = useState(null); // To store the selected file
-    const [loading, setLoading] = useState(false); // Manage loading state
+    const [profileImage, setProfileImage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [followLoading, setFollowLoading] = useState(false); // Specific loading state for follow/unfollow
 
     const fileInputRef = useRef(null);
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/signin');
-        } else {
-            checkAuth();
-            getProfile(userId)
-        }
-    }, [isAuthenticated, checkAuth, navigate]);
+        const checkAndFetchProfile = async () => {
+            await checkAuth();
+            if (isAuthenticated) {
+                getProfile(userId);
+            } else {
+                navigate('/signin');
+            }
+        };
+
+        checkAndFetchProfile();
+    }, [isAuthenticated, userProfile, userId, checkAuth, navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -66,8 +71,8 @@ const ProfilePage = () => {
 
     const uploadImage = async (e) => {
         e.preventDefault();
-        if (loading) return; // Prevent multiple requests while loading
-        if (user._id !== userProfile._id) return toast.error("You are not authorized to edit this profile")
+        if (loading) return;
+        if (user._id !== userProfile._id) return toast.error("You are not authorized to edit this profile");
 
         setLoading(true);
         const formData = new FormData();
@@ -89,6 +94,17 @@ const ProfilePage = () => {
         setIsPopupOpen(false);
     };
 
+    const handleFollowOrUnfollow = async () => {
+        setFollowLoading(true);
+        try {
+            await followOrUnfollow(userProfile._id);
+        } catch (error) {
+            console.error("Follow/Unfollow action failed.");
+        } finally {
+            setFollowLoading(false);
+        }
+    };
+
     return (
         <>
             <main className="bg-gray-100 bg-opacity-25">
@@ -100,15 +116,26 @@ const ProfilePage = () => {
                                     type="file"
                                     ref={fileInputRef}
                                     className='hidden'
-                                    onChange={handleImageChange} // Handle file change
+                                    onChange={handleImageChange}
                                     accept="image/*"
                                 />
-                                <img
-                                    className="w-20 h-20 flex items-center justify-center md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1 cursor-pointer"
-                                    src={profileImage ? URL.createObjectURL(profileImage) : userProfile?.personal_info.profile_img} // Image preview
-                                    alt="profile"
-                                    onClick={user?._id === userProfile?._id && handleImageClick} // Trigger file input on image click
-                                />
+                                <div className='relative overflow-hidden'>
+                                    <img
+                                        className="w-20 h-20 flex items-center justify-center md:w-40 md:h-40 object-cover rounded-full border-2 border-blue-400 p-1"
+                                        src={profileImage ? URL.createObjectURL(profileImage) : userProfile?.personal_info.profile_img}
+                                        alt="profile"
+
+                                    />
+                                    {
+                                        user?.Id === userProfile?._id &&
+                                        <button type='button'
+                                            onClick={user?._id === userProfile?._id && handleImageClick}
+                                            className='flex items-center justify-center text-lg absolute top-28 left-[42%] rounded-full bg-slate-400 bg-opacity-55 w-10 h-10'>
+                                            <i class="fi fi-rr-camera"></i>
+                                        </button>
+                                    }
+
+                                </div>
                                 {error && <p className='text-red-500 ml- mt-3 text-lg'>{error}</p>}
                                 {
                                     profileImage &&
@@ -138,13 +165,12 @@ const ProfilePage = () => {
                                 </span>
 
                                 <div className='flex gap-3'>
-
                                     {
                                         user?._id !== userProfile?._id &&
-                                        <button
-                                            className="w-16 bg-[#00d7ff] px-2 py-1 text-white font-semibold text-sm rounded block text-center sm:inline-block"
+                                        <button onClick={handleFollowOrUnfollow}
+                                            className={` bg-[#00d7ff] px-2 py-1  text-white font-semibold text-sm rounded block text-center sm:inline-block ${user?.following?.includes(userId) ? "bg-gray-500 text-black " : "bg-[#00d7ff] text-white"}`}
                                         >
-                                            Follow
+                                            {user?.following?.includes(userId) ? "Unfollow" : "Follow"}
                                         </button>
                                     }
                                     {
@@ -161,13 +187,13 @@ const ProfilePage = () => {
 
                             <ul className="hidden md:flex space-x-8 mb-4">
                                 <li>
-                                    <span className="font-semibold">0</span> posts
+                                    <span className="font-semibold">{userProfile?.posts?.length}</span> posts
                                 </li>
                                 <li>
-                                    <span className="font-semibold">0</span> followers
+                                    <span className="font-semibold">{userProfile?.followers.length}</span> followers
                                 </li>
                                 <li>
-                                    <span className="font-semibold">0</span> following
+                                    <span className="font-semibold">{userProfile?.following.length}</span> following
                                 </li>
                             </ul>
 
@@ -188,13 +214,13 @@ const ProfilePage = () => {
                     <div className="px-px md:px-3">
                         <ul className="flex md:hidden justify-around space-x-8 border-t border text-center p-2 text-gray-600 leading-snug text-sm">
                             <li>
-                                <span className="font-semibold text-gray-800 block">0</span> posts
+                                <span className="font-semibold text-gray-800 block">{userProfile?.posts.length}</span> posts
                             </li>
                             <li>
-                                <span className="font-semibold text-gray-800 block">0</span> followers
+                                <span className="font-semibold text-gray-800 block">{userProfile?.followers.length}</span> followers
                             </li>
                             <li>
-                                <span className="font-semibold text-gray-800 block">0</span> following
+                                <span className="font-semibold text-gray-800 block">{userProfile?.following.length}</span> following
                             </li>
                         </ul>
                     </div>
@@ -212,7 +238,7 @@ const ProfilePage = () => {
                                 name="username"
                                 value={formData.username}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                                className="w-full mt-1 p-2 border rounded"
                             />
                         </div>
                         <div className="mb-4">
@@ -222,7 +248,7 @@ const ProfilePage = () => {
                                 name="fullname"
                                 value={formData.fullname}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                                className="w-full mt-1 p-2 border rounded"
                             />
                         </div>
                         <div className="mb-4">
@@ -231,24 +257,23 @@ const ProfilePage = () => {
                                 name="bio"
                                 value={formData.bio}
                                 onChange={handleInputChange}
-                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                                className="w-full mt-1 p-2 border rounded"
                             />
                         </div>
-
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-end">
                             <button
-                                className="bg-gray-300 text-black px-4 py-2 rounded-md"
+                                className="mr-4 px-4 py-2 bg-gray-300 text-black rounded"
                                 onClick={handleCancel}
                                 disabled={loading}
                             >
                                 Cancel
                             </button>
                             <button
-                                className={`bg-[#00d7ff] text-white px-4 py-2 rounded-md ${loading ? 'bg-opacity-50 cursor-not-allowed' : ''}`}
+                                className={`px-4 py-2 ${loading ? 'bg-blue-500' : 'bg-blue-600'} text-white rounded`}
                                 onClick={handleSubmit}
                                 disabled={loading}
                             >
-                                {loading ? 'Saving...' : 'Save'}
+                                {loading ? 'Updating...' : 'Save'}
                             </button>
                         </div>
                     </div>

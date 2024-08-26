@@ -342,7 +342,45 @@ export const editProfile = async (req, res) => {
     }
 };
 
+export const getAllUsers = async (req, res) => {
+    try {
+        let users = await User.find().select("-personal_info.password");
+        res.status(200).json({ users, success: true });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
 
+export const followOrUnfollow = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        let user = await User.findById(req.userId);
+        let userToFollow = await User.findById(userId);
+
+        if (!userToFollow) {
+            return res.status(400).json({ message: "User not found", success: false });
+        }
+
+        if (user.following.includes(userId)) {
+            // Unfollow
+            user.following = user.following.filter(id => id.toString() !== userId);
+            userToFollow.followers = userToFollow.followers.filter(id => id.toString() !== req.userId);
+            res.status(200).json({ message: "User unfollowed successfully", success: true });
+        } else {
+            // Follow
+            user.following.push(userId);
+            userToFollow.followers.push(req.userId);
+            res.status(200).json({ message: "User followed successfully", success: true });
+        }
+
+        await user.save();
+        await userToFollow.save();
+
+
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
 
 
 export const deleteUser = async (req, res) => {

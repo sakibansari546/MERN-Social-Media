@@ -91,9 +91,6 @@ export const useAuthStore = create((set) => ({
         try {
             const res = await axios.patch(`${API_URL}/edit-profile`, formData, { withCredentials: true });
             set({ user: res.data.user, isLoading: false });
-            console.log(res.data.user);
-            console.log(userProfile);
-
             return res.data.user;
         } catch (error) {
             console.error('Edit Profile Error:', error.response ? error.response.data : error.message);
@@ -112,6 +109,18 @@ export const useAuthStore = create((set) => ({
             set({ error: error.response?.data?.message || "Error getting profile", isLoading: false });
             throw error;
         }
-    }
+    },
+    followOrUnfollow: async (userId) => {
+        set({ isLoading: true, error: null });
+        try {
+            const res = await axios.patch(`${API_URL}/follow-unfollow/${userId}`, {}, { withCredentials: true });
+            set({ isAuthenticated: true, isLoading: false });
+            return res.data.user;
+        } catch (error) {
+            console.error('Follow/Unfollow Error:', error.response ? error.response.data : error.message);
+            set({ error: error.response?.data?.message || "Error following/unfollowing", isLoading: false });
+            throw error;
+        }
+    },
 
 }));
