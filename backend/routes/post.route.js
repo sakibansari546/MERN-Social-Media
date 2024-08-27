@@ -7,6 +7,6 @@ const router = Router();
 router.post("/create-post", verifyToken, upload.single("postImage"), createPost);
 router.get("/get-posts", getPosts);
 
-router.patch("/like-dislike", verifyToken, likeOrNot)
+router.post("/like-unlike", verifyToken, likeOrNot)
 
 export default router;

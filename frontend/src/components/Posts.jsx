@@ -3,20 +3,21 @@ import Post from './Post'
 import postStore from '../store/post.store'
 
 const Posts = () => {
-    const { getPosts, posts, isLoading, error } = postStore()
+    const { getPosts, posts, likeOrNot, isLoading, error } = postStore()
 
     useEffect(() => {
         getPosts()
-        // console.log(posts);
+    }, [getPosts, likeOrNot])
 
-    }, [getPosts])
 
     return (
-        <div className='mb-24'>
+        <div className='pb-20'>
+
             {
-                posts?.map((post) => (
-                    <Post key={post.id} post={post} />
-                ))
+                error ? <h1>{error}</h1> :
+                    posts?.map((post) => (
+                        <Post key={post._id} post={post} />
+                    ))
             }
         </div>
     )

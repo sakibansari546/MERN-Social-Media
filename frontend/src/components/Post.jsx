@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import postStore from '../store/post.store';
 
 const Post = ({ post }) => {
-    let { author, caption, postImage } = post;
-    // console.log(post);
+    let { author, caption, postImage, _id } = post;
+    const { posts, likeOrNot, getPosts, message } = postStore();
+    const [loading, setLoading] = useState(false)
+
+    // console.log(_id);
+    const handleLikeUnlike = async (postId) => {
+        try {
+            await likeOrNot(postId)
+            // toast.success(message)
+            getPosts();
+            setLoading((pre) => !pre)
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
 
     return (
         <div>
@@ -14,14 +30,14 @@ const Post = ({ post }) => {
                     <div className="w-full flex justify-between p-3">
                         <Link to={`/profile/${author?._id}`} className="flex">
                             <div className="flex">
-                                <div className="rounded-full h-8 w-8 bg-gray-500 flex items-center justify-center overflow-hidden">
+                                <div className="rounded-full h-8 w-8 bg-gray-100 flex items-center justify-center overflow-hidden">
                                     <img src={author?.personal_info.profile_img} alt="profilepic" />
                                 </div>
                                 <span className="pt-1 ml-2 font-bold text-sm">{author?.personal_info?.username}</span>
                             </div>
                         </Link>
                         <span className="px-2 hover:bg-gray-300 cursor-pointer rounded flex items-center justify-center">
-                            <i class="fi fi-bs-menu-dots"></i>
+                            <i className="fi fi-bs-menu-dots"></i>
                         </span>
                     </div>
                     <div className='w-full bg-gray-100 flex items-center justify-center'>
@@ -32,9 +48,17 @@ const Post = ({ post }) => {
                         />
                     </div>
                     <div className="px-3 pb-2">
-                        <div className="pt-2">
-                            <i className="far fa-heart cursor-pointer"></i>
-                            <span className="text-sm text-gray-400 font-medium">12 likes</span>
+                        <div className='py-2 pt-3 flex items-center justify-between'>
+                            <button onClick={() => handleLikeUnlike(post._id)} className="flex items-center gap-1 cursor-pointer">
+                                <i className="fi fi-rs-heart text-xl font-bold"></i>
+                                <span className=" text-gray-400 font-medium ">{post?.likes?.length}</span>
+                            </button>
+                            <button className="cursor-pointer">
+                                <i className="fi fi-rr-comment-alt-dots text-xl"></i>
+                            </button>
+                            <button className="cursor-pointer">
+                                <i className="fi fi-br-bookmark text-xl"></i>
+                            </button>
                         </div>
                         <div className="pt-1">
                             <div className="mb-2 text-sm">
@@ -43,6 +67,7 @@ const Post = ({ post }) => {
                             </div>
                         </div>
                     </div>
+
                 </div>
 
             </div>

@@ -127,7 +127,7 @@ const ProfilePage = () => {
 
                                     />
                                     {
-                                        user?.Id === userProfile?._id &&
+                                        user?._id === userProfile?._id &&
                                         <button type='button'
                                             onClick={user?._id === userProfile?._id && handleImageClick}
                                             className='flex items-center justify-center text-lg absolute top-28 left-[42%] rounded-full bg-slate-400 bg-opacity-55 w-10 h-10'>
