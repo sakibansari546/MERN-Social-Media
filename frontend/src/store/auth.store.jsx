@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_MODE === "development" ? "http://localhost:3000/api/auth" : "/api/auth";
+const API_URL = "https://mern-social-media-tbpc.onrender.com/api/auth";
 
 // console.log(import.meta.env.VITE_MODE);
 

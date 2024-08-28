@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_MODE === "development" ? "http://localhost:3000/api/post" : "/api/post";
+const API_URL = "https://mern-social-media-tbpc.onrender.com/api/post";
 
 const postStore = create((set) => ({
     posts: [],
