@@ -14,7 +14,7 @@ dotenv.config()
 
 // Middlewares
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: 'https://mern-social-media-1-7wju.onrender.com',
     credentials: true,
     optionSuccessStatus: 200
 }
